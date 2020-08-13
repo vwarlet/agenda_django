@@ -22,7 +22,7 @@ def submit_login(request):
             return redirect('/')
         else:
             messages.error(request, "Usuário ou senha inválido!")
-    redirect('/')    
+    return redirect('/')    
 
 @login_required(login_url='/login/')
 def lista_eventos(request):
