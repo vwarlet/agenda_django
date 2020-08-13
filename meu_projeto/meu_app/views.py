@@ -3,6 +3,9 @@ from meu_app.models import Evento
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.http.response import JsonResponse
+from datetime import datetime, timedelta
 
 
 def login_user(request):
@@ -28,7 +31,9 @@ def submit_login(request):
 def lista_eventos(request):
     # mostra apenas os eventos do usuario logado
     usuario = request.user
-    evento = Evento.objects.filter(usuario=usuario)
+    evento = Evento.objects.filter(usuario=usuario) 
+        # se eu adicionar ao filtro (data_atual__gt=data_atual), exibirá só os próximos eventos
+        # e (data_atual__lt=data_atual), exibe só os eventos que já passaram
     dados = {'eventos': evento}
     return render(request, 'agenda.html', dados)
 
@@ -71,3 +76,8 @@ def delete_evento(request, id_evento):
     if usuario == evento.usuario:
         evento.delete()
     return redirect('/')
+
+def json_lista_eventos(request, id_usuario):
+    usuario = User.objects.get(id=id_usuario)
+    evento = Evento.objects.filter(usuario=usuario).values('id', 'titulo', 'data_evento', 'descricao')
+    return JsonResponse(list(evento), safe=False)
